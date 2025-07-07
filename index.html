@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laporan Kinerja Perawatan & Pemeliharaan</title>
     <style>
-        /* CSS Umum (tidak ada perubahan) */
+        /* CSS Umum */
         body { font-family: Arial, sans-serif; margin: 0; padding: 20px 2cm; background-color: #f4f4f4; color: #333; }
         .container { max-width: 100%; margin: auto; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border-radius: 8px; }
         .report-header-image { width: 100%; margin-bottom: 20px; }
@@ -37,13 +37,7 @@
         .report-footer { display: none; margin-top: 50px; width: 100%; font-family: 'Times New Roman', Times, serif; }
         .signature-block { display: flex; justify-content: space-between; text-align: center; }
         .signature-col { width: 30%; }
-        
-        /* [PERUBAHAN] Mengatur jarak paragraf di blok tanda tangan */
-        .signature-col p:not(.name) {
-            margin-top: 0;
-            margin-bottom: 2px;
-        }
-
+        .signature-col p:not(.name) { margin-top: 0; margin-bottom: 2px; }
         .signature-col .name { margin-top: 80px; font-weight: bold; text-decoration: underline; }
         
         @media print {
@@ -54,6 +48,52 @@
             .report-footer { display: block; }
             .report-header-image img { width: 50%; display: block; margin: 0 auto 20px auto; }
             @page { size: A4 landscape; margin: 1cm 2cm 2cm 2cm; }
+        }
+
+        /* --- [BARU] Aturan untuk Tampilan Mobile (Responsif) --- */
+        @media (max-width: 768px) {
+            /* Mengurangi padding utama untuk memberi lebih banyak ruang */
+            body {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            /* Membuat header tabel (judul & tombol) menjadi vertikal */
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start; /* Rata kiri */
+                gap: 15px; /* Jarak antara judul dan tombol */
+            }
+            .table-header > div {
+                margin-top: 0;
+            }
+
+            /* [PENTING] Mengaktifkan scroll horizontal untuk tabel */
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch; /* Gerakan scroll lebih mulus di iOS */
+                border: 1px solid #ddd; /* Memberi sedikit visual batas */
+                border-radius: 4px;
+                padding-bottom: 10px; /* Jarak agar scrollbar tidak terlalu mepet */
+            }
+
+            /* Ukuran font dan tombol disesuaikan */
+            h2.form-title, h2.table-title {
+                font-size: 1.5em;
+            }
+
+            .btn, button {
+                padding: 8px 12px;
+                font-size: 0.9em;
+            }
+
+            /* Mengurangi jarak di blok tanda tangan jika terlihat di layar */
+            .signature-col .name {
+                margin-top: 40px;
+            }
         }
     </style>
 </head>
