@@ -45,61 +45,39 @@
             .container { box-shadow: none; border-radius: 0; padding: 0; max-width: 100%; }
             .form-container, .table-header, .action-buttons { display: none !important; }
             th, td { padding: 5px; border: 1px solid #000; }
-            .report-footer { display: block; }
             .report-header-image img { width: 50%; display: block; margin: 0 auto 20px auto; }
             @page { size: A4 landscape; margin: 1cm 2cm 2cm 2cm; }
+
+            /* --- [MODIFIKASI] MENCEGAH PAGE BREAK --- */
+            
+            /* 1. Mencegah blok tanda tangan terpotong */
+            .report-footer { 
+                display: block;
+                break-inside: avoid; /* Properti modern */
+                page-break-inside: avoid; /* Properti lama untuk kompatibilitas */
+            }
+
+            /* 2. Mencegah grup baris tabel terpotong */
+            #laporan-table > tbody {
+                break-inside: avoid; /* Properti modern */
+                page-break-inside: avoid; /* Properti lama untuk kompatibilitas */
+            }
         }
 
-        /* --- [BARU] Aturan untuk Tampilan Mobile (Responsif) --- */
         @media (max-width: 768px) {
-            /* Mengurangi padding utama untuk memberi lebih banyak ruang */
-            body {
-                padding: 15px;
-            }
-
-            .container {
-                padding: 10px;
-            }
-
-            /* Membuat header tabel (judul & tombol) menjadi vertikal */
-            .table-header {
-                flex-direction: column;
-                align-items: flex-start; /* Rata kiri */
-                gap: 15px; /* Jarak antara judul dan tombol */
-            }
-            .table-header > div {
-                margin-top: 0;
-            }
-
-            /* [PENTING] Mengaktifkan scroll horizontal untuk tabel */
-            .table-container {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch; /* Gerakan scroll lebih mulus di iOS */
-                border: 1px solid #ddd; /* Memberi sedikit visual batas */
-                border-radius: 4px;
-                padding-bottom: 10px; /* Jarak agar scrollbar tidak terlalu mepet */
-            }
-
-            /* Ukuran font dan tombol disesuaikan */
-            h2.form-title, h2.table-title {
-                font-size: 1.5em;
-            }
-
-            .btn, button {
-                padding: 8px 12px;
-                font-size: 0.9em;
-            }
-
-            /* Mengurangi jarak di blok tanda tangan jika terlihat di layar */
-            .signature-col .name {
-                margin-top: 40px;
-            }
+            body { padding: 15px; }
+            .container { padding: 10px; }
+            .table-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .table-header > div { margin-top: 0; }
+            .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid #ddd; border-radius: 4px; padding-bottom: 10px; }
+            h2.form-title, h2.table-title { font-size: 1.5em; }
+            .btn, button { padding: 8px 12px; font-size: 0.9em; }
+            .signature-col .name { margin-top: 40px; }
         }
     </style>
 </head>
 <body>
 
-<!-- HTML tidak ada perubahan -->
 <div class="container">
     <div class="report-header-image">
         <img src="kop.jpg" alt="Kop Surat Laporan">
@@ -156,7 +134,7 @@
                     <th>BAHAN</th><th>UKURAN</th><th>BANYAKNYA</th>
                 </tr>
             </thead>
-            <tbody id="table-body"></tbody>
+            <!-- tbody akan dibuat oleh JavaScript -->
         </table>
     </div>
     <div class="report-footer">
@@ -169,7 +147,7 @@
 </div>
 
 <script>
-// JavaScript tidak ada perubahan
+// JavaScript lainnya tidak berubah ...
 function getNextId() {
     const lastId = localStorage.getItem('lastId_v2') || '0';
     const nextId = parseInt(lastId) + 1;
@@ -270,16 +248,26 @@ function tambahAlatBantuKeList(data = null) {
         document.getElementById('bahan').focus();
     }
 }
+
+// --- [FUNGSI YANG DIMODIFIKASI] ---
 function renderTable() {
     updateLaporanPeriode();
     const laporanList = getLaporanFromStorage();
-    const tableBody = document.getElementById('table-body');
-    tableBody.innerHTML = '';
+    const table = document.getElementById('laporan-table'); // Ambil elemen tabel
+
+    // Hapus semua tbody yang ada sebelumnya untuk menghindari duplikasi
+    table.querySelectorAll('tbody').forEach(tbody => tbody.remove());
+
     laporanList.forEach((item, index) => {
         const rowCount = item.alatBantu.length > 0 ? item.alatBantu.length : 1;
+        
+        // Buat elemen <tbody> baru untuk setiap grup data. Ini kuncinya!
+        const entryTbody = document.createElement('tbody');
+
         for (let i = 0; i < rowCount; i++) {
             const row = document.createElement('tr');
             if (i === 0) {
+                // Baris pertama dengan rowspan
                 row.innerHTML = `
                     <td rowspan="${rowCount}">${index + 1}</td>
                     <td rowspan="${rowCount}">${formatTanggalLengkap(item.tanggal)}</td>
@@ -297,15 +285,21 @@ function renderTable() {
                         <button class="btn btn-delete" onclick="deleteData(${item.id})">Hapus</button>
                     </td>`;
             } else {
+                // Baris selanjutnya untuk alat bantu
                 row.innerHTML = `
                     <td>${item.alatBantu[i]?.bahan || ''}</td>
                     <td>${item.alatBantu[i]?.ukuran || ''}</td>
                     <td>${item.alatBantu[i]?.banyaknya || ''}</td>`;
             }
-            tableBody.appendChild(row);
+            // Tambahkan baris ke dalam tbody khusus untuk entri ini
+            entryTbody.appendChild(row);
         }
+        // Tambahkan tbody yang sudah lengkap (satu grup data) ke tabel utama
+        table.appendChild(entryTbody);
     });
 }
+// ------------------------------------
+
 function editData(id) {
     const laporanList = getLaporanFromStorage();
     const itemToEdit = laporanList.find(item => item.id == id);
