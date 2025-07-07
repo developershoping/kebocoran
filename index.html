@@ -50,17 +50,32 @@
 
             /* --- [MODIFIKASI] MENCEGAH PAGE BREAK --- */
             
-            /* 1. Mencegah blok tanda tangan terpotong */
-            .report-footer { 
-                display: block;
-                break-inside: avoid; /* Properti modern */
-                page-break-inside: avoid; /* Properti lama untuk kompatibilitas */
+            /* 1. Mencegah grup baris tabel terpotong */
+            #laporan-table > tbody {
+                break-inside: avoid;
+                page-break-inside: avoid;
             }
 
-            /* 2. Mencegah grup baris tabel terpotong */
-            #laporan-table > tbody {
-                break-inside: avoid; /* Properti modern */
-                page-break-inside: avoid; /* Properti lama untuk kompatibilitas */
+            /* 2. Wrapper untuk memastikan 2 data terakhir dan TTD tetap bersama */
+            .last-page-wrapper {
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+            }
+
+            /* 3. Tampilkan footer yang dipindah, sembunyikan yang asli */
+            .last-page-wrapper .report-footer {
+                display: block; /* Pastikan footer di dalam wrapper terlihat */
+            }
+            .report-footer.moved {
+                display: none !important; /* Sembunyikan footer asli yang posisinya telah dipindah */
+            }
+
+            /* 4. Pastikan tabel baru di dalam wrapper terlihat benar */
+            .last-page-wrapper table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.9em;
+                margin-top: 20px;
             }
         }
 
@@ -121,7 +136,8 @@
         <div class="table-header">
             <h2 class="table-title">Data Laporan Tersimpan</h2>
             <div>
-                <button class="btn btn-print" onclick="window.print()">Cetak Laporan</button>
+                <!-- [MODIFIKASI] Tombol cetak memanggil fungsi baru -->
+                <button class="btn btn-print" onclick="prepareAndPrint()">Cetak Laporan</button>
                 <button class="btn btn-reset-all" onclick="resetAllData()">Reset Semua Data</button>
             </div>
         </div>
@@ -147,7 +163,7 @@
 </div>
 
 <script>
-// JavaScript lainnya tidak berubah ...
+// JavaScript lainnya tidak berubah...
 function getNextId() {
     const lastId = localStorage.getItem('lastId_v2') || '0';
     const nextId = parseInt(lastId) + 1;
@@ -248,26 +264,17 @@ function tambahAlatBantuKeList(data = null) {
         document.getElementById('bahan').focus();
     }
 }
-
-// --- [FUNGSI YANG DIMODIFIKASI] ---
 function renderTable() {
     updateLaporanPeriode();
     const laporanList = getLaporanFromStorage();
-    const table = document.getElementById('laporan-table'); // Ambil elemen tabel
-
-    // Hapus semua tbody yang ada sebelumnya untuk menghindari duplikasi
+    const table = document.getElementById('laporan-table');
     table.querySelectorAll('tbody').forEach(tbody => tbody.remove());
-
     laporanList.forEach((item, index) => {
         const rowCount = item.alatBantu.length > 0 ? item.alatBantu.length : 1;
-        
-        // Buat elemen <tbody> baru untuk setiap grup data. Ini kuncinya!
         const entryTbody = document.createElement('tbody');
-
         for (let i = 0; i < rowCount; i++) {
             const row = document.createElement('tr');
             if (i === 0) {
-                // Baris pertama dengan rowspan
                 row.innerHTML = `
                     <td rowspan="${rowCount}">${index + 1}</td>
                     <td rowspan="${rowCount}">${formatTanggalLengkap(item.tanggal)}</td>
@@ -285,21 +292,16 @@ function renderTable() {
                         <button class="btn btn-delete" onclick="deleteData(${item.id})">Hapus</button>
                     </td>`;
             } else {
-                // Baris selanjutnya untuk alat bantu
                 row.innerHTML = `
                     <td>${item.alatBantu[i]?.bahan || ''}</td>
                     <td>${item.alatBantu[i]?.ukuran || ''}</td>
                     <td>${item.alatBantu[i]?.banyaknya || ''}</td>`;
             }
-            // Tambahkan baris ke dalam tbody khusus untuk entri ini
             entryTbody.appendChild(row);
         }
-        // Tambahkan tbody yang sudah lengkap (satu grup data) ke tabel utama
         table.appendChild(entryTbody);
     });
 }
-// ------------------------------------
-
 function editData(id) {
     const laporanList = getLaporanFromStorage();
     const itemToEdit = laporanList.find(item => item.id == id);
@@ -339,6 +341,83 @@ function resetAllData() {
         alert('Semua data laporan telah berhasil dihapus.');
     }
 }
+
+// --- [MODIFIKASI BARU] SCRIPT UNTUK CETAK ---
+let movedElements = null;
+
+function prepareAndPrint() {
+    const mainTable = document.getElementById('laporan-table');
+    const allTbodies = mainTable.querySelectorAll('tbody');
+    const footer = document.querySelector('.report-footer');
+    const container = document.querySelector('.container');
+
+    // Jika entri kurang dari 3, tidak perlu melakukan apa-apa, cetak saja seperti biasa.
+    if (allTbodies.length < 3) {
+        window.print();
+        return;
+    }
+
+    // Tandai footer asli agar bisa disembunyikan oleh CSS
+    footer.classList.add('moved');
+
+    // Ambil 2 entri terakhir (tbody terakhir dan kedua terakhir)
+    const lastTbody = allTbodies[allTbodies.length - 1];
+    const secondLastTbody = allTbodies[allTbodies.length - 2];
+
+    // Buat wrapper
+    const wrapper = document.createElement('div');
+    wrapper.className = 'last-page-wrapper';
+
+    // Buat tabel baru di dalam wrapper
+    const newTable = document.createElement('table');
+    const originalThead = mainTable.querySelector('thead');
+    newTable.appendChild(originalThead.cloneNode(true)); // Salin header tabel
+
+    // Pindahkan 2 tbody terakhir ke tabel baru
+    newTable.appendChild(secondLastTbody);
+    newTable.appendChild(lastTbody);
+
+    // Masukkan tabel baru dan footer ke dalam wrapper
+    wrapper.appendChild(newTable);
+    wrapper.appendChild(footer.cloneNode(true)); // Salin footer ke dalam wrapper
+
+    // Tambahkan wrapper ke kontainer utama
+    container.appendChild(wrapper);
+    
+    // Simpan referensi elemen yang dipindahkan untuk proses cleanup
+    movedElements = {
+        wrapper,
+        footer,
+        lastTbody,
+        secondLastTbody,
+        mainTable
+    };
+    
+    // Panggil dialog cetak
+    window.print();
+}
+
+function cleanupAfterPrint() {
+    // Jika tidak ada elemen yang dipindahkan, hentikan fungsi
+    if (!movedElements) return;
+
+    const { wrapper, footer, lastTbody, secondLastTbody, mainTable } = movedElements;
+
+    // Kembalikan footer ke status semula (hapus class 'moved')
+    footer.classList.remove('moved');
+
+    // Kembalikan dua tbody ke tabel utama dalam urutan yang benar
+    mainTable.appendChild(secondLastTbody);
+    mainTable.appendChild(lastTbody);
+    
+    // Hapus wrapper yang sekarang sudah kosong
+    wrapper.remove();
+
+    // Reset variabel global
+    movedElements = null;
+}
+
+window.addEventListener('afterprint', cleanupAfterPrint);
 
 document.addEventListener('DOMContentLoaded', renderTable);
 </script>
