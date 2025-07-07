@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Kinerja Perawatan & Pemeliharaan</title>
+    <style>
+        /* CSS Umum (tidak ada perubahan) */
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px 2cm; background-color: #f4f4f4; color: #333; }
+        .container { max-width: 100%; margin: auto; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border-radius: 8px; }
+        .report-header-image { width: 100%; margin-bottom: 20px; }
+        .report-header-image img { width: 100%; height: auto; }
+        .report-title-container { font-family: 'Times New Roman', Times, serif; text-align: center; margin-bottom: 30px; }
+        .title-line { padding: 2px 0; font-weight: bold; font-size: 1.1em; text-transform: uppercase; }
+        .form-container { border: 1px solid #ddd; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        h2.form-title, h2.table-title { color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 5px; margin-top: 0; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 5px; font-weight: bold; }
+        .form-group input, .form-group textarea { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%; box-sizing: border-box; }
+        #alat-bantu-form { margin-top: 20px; padding: 15px; border: 1px dashed #007bff; border-radius: 5px; background-color: #f8f9fa; }
+        #alat-bantu-list-container { margin-top: 15px; }
+        #alat-bantu-list li { margin-bottom: 5px; background: #e9ecef; padding: 5px 10px; border-radius: 4px; }
+        .btn, button { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; margin-right: 10px; margin-top: 10px; }
+        .btn-add { background-color: #28a745; color: white; }
+        .btn-save { background-color: #007bff; color: white; }
+        .btn-print { background-color: #6c757d; color: white; }
+        .btn-edit { background-color: #ffc107; color: black; padding: 5px 10px; margin: 0 5px 0 0; }
+        .btn-delete { background-color: #dc3545; color: white; padding: 5px 10px; margin: 0; }
+        button.remove-item { background-color: #dc3545; color: white; padding: 2px 8px; font-size: 0.8em; margin-left: 10px; }
+        .btn-reset-all { background-color: #c82333; color: white; }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9em; }
+        th, td { border: 1px solid #000; padding: 8px; text-align: left; vertical-align: middle; }
+        th { background-color: #e9ecef; text-align: center; font-weight: bold; }
+        .action-buttons { text-align: center; }
+        .report-footer { display: none; margin-top: 50px; width: 100%; font-family: 'Times New Roman', Times, serif; }
+        .signature-block { display: flex; justify-content: space-between; text-align: center; }
+        .signature-col { width: 30%; }
+        
+        /* [PERUBAHAN] Mengatur jarak paragraf di blok tanda tangan */
+        .signature-col p:not(.name) {
+            margin-top: 0;
+            margin-bottom: 2px;
+        }
+
+        .signature-col .name { margin-top: 80px; font-weight: bold; text-decoration: underline; }
+        
+        @media print {
+            body { background-color: white; margin: 0; padding: 0; font-size: 10pt; }
+            .container { box-shadow: none; border-radius: 0; padding: 0; max-width: 100%; }
+            .form-container, .table-header, .action-buttons { display: none !important; }
+            th, td { padding: 5px; border: 1px solid #000; }
+            .report-footer { display: block; }
+            .report-header-image img { width: 50%; display: block; margin: 0 auto 20px auto; }
+            @page { size: A4 landscape; margin: 1cm 2cm 2cm 2cm; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HTML tidak ada perubahan -->
+<div class="container">
+    <div class="report-header-image">
+        <img src="kop.jpg" alt="Kop Surat Laporan">
+    </div>
+    <div class="report-title-container">
+        <div class="title-line">LAPORAN BULANAN BAGIAN PERAWATAN & PEMELIHARAAN</div>
+        <div class="title-line">SUB BAGIAN TRANSMISI DAN INSTALASI</div>
+        <div class="title-line" id="laporan-periode">HASIL LAPORAN KINERJA KEBOCORAN</div>
+    </div>
+    <div class="form-container">
+        <h2 class="form-title">Form Input Laporan Kejadian</h2>
+        <form id="laporan-form">
+            <input type="hidden" id="edit-id">
+            <h4>Data Utama Kejadian</h4>
+            <div class="form-grid">
+                <div class="form-group"><label for="tanggal">Tanggal Kejadian</label><input type="date" id="tanggal" required></div>
+                <div class="form-group"><label for="nama-kegiatan">Nama Kegiatan</label><input type="text" id="nama-kegiatan" required></div>
+                <div class="form-group"><label for="lokasi">Lokasi</label><input type="text" id="lokasi"></div>
+                <div class="form-group"><label for="jumlah-tenaga-kerja">Jumlah Tenaga Kerja</label><input type="text" id="jumlah-tenaga-kerja"></div>
+                <div class="form-group"><label for="masalah">Masalah</label><input type="text" id="masalah"></div>
+                <div class="form-group"><label for="cara-kerja">Cara Kerja</label><input type="text" id="cara-kerja"></div>
+                <div class="form-group"><label for="lama-pengerjaan">Lama Pengerjaan</label><input type="text" id="lama-pengerjaan"></div>
+            </div>
+            <div id="alat-bantu-form">
+                <h4>Tambah Alat Bantu</h4>
+                <div class="form-grid">
+                    <div class="form-group"><label for="bahan">Bahan</label><input type="text" id="bahan"></div>
+                    <div class="form-group"><label for="ukuran">Ukuran</label><input type="text" id="ukuran"></div>
+                    <div class="form-group"><label for="banyaknya">Banyaknya</label><input type="text" id="banyaknya"></div>
+                </div>
+                <button type="button" class="btn btn-add" onclick="tambahAlatBantuKeList()">+ Tambah Alat Bantu</button>
+            </div>
+            <div id="alat-bantu-list-container">
+                <h5>Daftar Alat Bantu untuk Kejadian Ini:</h5>
+                <ul id="alat-bantu-list"></ul>
+            </div>
+            <button type="submit" class="btn btn-save">Simpan Laporan</button>
+        </form>
+    </div>
+    <div class="table-container">
+        <div class="table-header">
+            <h2 class="table-title">Data Laporan Tersimpan</h2>
+            <div>
+                <button class="btn btn-print" onclick="window.print()">Cetak Laporan</button>
+                <button class="btn btn-reset-all" onclick="resetAllData()">Reset Semua Data</button>
+            </div>
+        </div>
+        <table id="laporan-table">
+            <thead>
+                <tr>
+                    <th rowspan="2">NO</th><th rowspan="2">TANGGAL KEJADIAN</th><th rowspan="2">NAMA KEGIATAN</th><th rowspan="2">LOKASI</th><th rowspan="2">JUMLAH TENAGA KERJA</th><th rowspan="2">MASALAH</th><th rowspan="2">CARA KERJA</th><th rowspan="2">LAMA PENGERJAAN</th><th colspan="3">ALAT BANTU</th><th rowspan="2" class="action-buttons">AKSI</th>
+                </tr>
+                <tr>
+                    <th>BAHAN</th><th>UKURAN</th><th>BANYAKNYA</th>
+                </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+        </table>
+    </div>
+    <div class="report-footer">
+        <div class="signature-block">
+            <div class="signature-col"><p>Mengetahui</p><p>Direktur</p><p class="name">Moses P. Limbongan, S. S</p></div>
+            <div class="signature-col"><p>Di Periksa</p><p>Kepala Bagian Perawatan</p><p class="name">Linan Patanggi</p></div>
+            <div class="signature-col"><p>Di Buat</p><p>Kasubag. Transmisi & Instalasi</p><p class="name">Fery Panggalo</p></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// JavaScript tidak ada perubahan
+function getNextId() {
+    const lastId = localStorage.getItem('lastId_v2') || '0';
+    const nextId = parseInt(lastId) + 1;
+    localStorage.setItem('lastId_v2', nextId);
+    return nextId;
+}
+function getLaporanFromStorage() {
+    return JSON.parse(localStorage.getItem('laporanData_v2')) || [];
+}
+function formatTanggalLengkap(tanggalString) {
+    if (!tanggalString) return '';
+    const parts = tanggalString.split('-');
+    const tanggalObj = new Date(parts[0], parts[1] - 1, parts[2]);
+    const namaHari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+    const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    const hari = namaHari[tanggalObj.getDay()];
+    const tgl = String(tanggalObj.getDate()).padStart(2, '0');
+    const bulan = namaBulan[tanggalObj.getMonth()];
+    const tahun = tanggalObj.getFullYear();
+    return `${hari}, ${tgl} ${bulan} ${tahun}`;
+}
+function updateLaporanPeriode() {
+    const periodeElement = document.getElementById('laporan-periode');
+    const laporanList = getLaporanFromStorage();
+    if (laporanList.length === 0) {
+        periodeElement.textContent = 'HASIL LAPORAN KINERJA KEBOCORAN (BELUM ADA DATA)';
+        return;
+    }
+    const dates = laporanList.map(item => new Date(item.tanggal));
+    const maxDate = new Date(Math.max.apply(null, dates));
+    const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    const bulan = namaBulan[maxDate.getMonth()];
+    const tahun = maxDate.getFullYear();
+    const periodeText = `1-30 ${bulan} ${tahun}`;
+    periodeElement.textContent = `HASIL LAPORAN KINERJA KEBOCORAN ${periodeText}`;
+}
+document.getElementById('laporan-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const id = document.getElementById('edit-id').value;
+    let alatBantu = [];
+    document.querySelectorAll('#alat-bantu-list li').forEach(li => {
+        alatBantu.push(JSON.parse(li.dataset.alat));
+    });
+    if (alatBantu.length === 0) {
+        if (!confirm('Anda belum menambahkan Alat Bantu. Tetap simpan?')) {
+            return;
+        }
+    }
+    const laporanData = {
+        tanggal: document.getElementById('tanggal').value,
+        namaKegiatan: document.getElementById('nama-kegiatan').value,
+        lokasi: document.getElementById('lokasi').value,
+        jumlahTenagaKerja: document.getElementById('jumlah-tenaga-kerja').value,
+        masalah: document.getElementById('masalah').value,
+        caraKerja: document.getElementById('cara-kerja').value,
+        lamaPengerjaan: document.getElementById('lama-pengerjaan').value,
+        alatBantu: alatBantu
+    };
+    let laporanList = getLaporanFromStorage();
+    if (id) {
+        const index = laporanList.findIndex(item => item.id == id);
+        if (index > -1) {
+            laporanList[index] = { ...laporanData, id: parseInt(id) };
+        }
+    } else {
+        laporanData.id = getNextId();
+        laporanList.push(laporanData);
+    }
+    localStorage.setItem('laporanData_v2', JSON.stringify(laporanList));
+    resetForm();
+    renderTable();
+});
+function tambahAlatBantuKeList(data = null) {
+    const list = document.getElementById('alat-bantu-list');
+    const alat = data || {
+        bahan: document.getElementById('bahan').value,
+        ukuran: document.getElementById('ukuran').value,
+        banyaknya: document.getElementById('banyaknya').value
+    };
+    if (!alat.bahan.trim()) {
+        alert('Nama Bahan tidak boleh kosong.');
+        return;
+    }
+    const li = document.createElement('li');
+    li.textContent = `Bahan: ${alat.bahan}, Ukuran: ${alat.ukuran}, Banyaknya: ${alat.banyaknya}`;
+    li.dataset.alat = JSON.stringify(alat);
+    const removeBtn = document.createElement('button');
+    removeBtn.textContent = 'x';
+    removeBtn.className = 'remove-item';
+    removeBtn.type = 'button';
+    removeBtn.onclick = function() { li.remove(); };
+    li.appendChild(removeBtn);
+    list.appendChild(li);
+    if (!data) {
+        document.getElementById('bahan').value = '';
+        document.getElementById('ukuran').value = '';
+        document.getElementById('banyaknya').value = '';
+        document.getElementById('bahan').focus();
+    }
+}
+function renderTable() {
+    updateLaporanPeriode();
+    const laporanList = getLaporanFromStorage();
+    const tableBody = document.getElementById('table-body');
+    tableBody.innerHTML = '';
+    laporanList.forEach((item, index) => {
+        const rowCount = item.alatBantu.length > 0 ? item.alatBantu.length : 1;
+        for (let i = 0; i < rowCount; i++) {
+            const row = document.createElement('tr');
+            if (i === 0) {
+                row.innerHTML = `
+                    <td rowspan="${rowCount}">${index + 1}</td>
+                    <td rowspan="${rowCount}">${formatTanggalLengkap(item.tanggal)}</td>
+                    <td rowspan="${rowCount}">${item.namaKegiatan}</td>
+                    <td rowspan="${rowCount}">${item.lokasi}</td>
+                    <td rowspan="${rowCount}">${item.jumlahTenagaKerja || ''}</td>
+                    <td rowspan="${rowCount}">${item.masalah}</td>
+                    <td rowspan="${rowCount}">${item.caraKerja}</td>
+                    <td rowspan="${rowCount}">${item.lamaPengerjaan}</td>
+                    <td>${item.alatBantu[i]?.bahan || ''}</td>
+                    <td>${item.alatBantu[i]?.ukuran || ''}</td>
+                    <td>${item.alatBantu[i]?.banyaknya || ''}</td>
+                    <td rowspan="${rowCount}" class="action-buttons">
+                        <button class="btn btn-edit" onclick="editData(${item.id})">Edit</button>
+                        <button class="btn btn-delete" onclick="deleteData(${item.id})">Hapus</button>
+                    </td>`;
+            } else {
+                row.innerHTML = `
+                    <td>${item.alatBantu[i]?.bahan || ''}</td>
+                    <td>${item.alatBantu[i]?.ukuran || ''}</td>
+                    <td>${item.alatBantu[i]?.banyaknya || ''}</td>`;
+            }
+            tableBody.appendChild(row);
+        }
+    });
+}
+function editData(id) {
+    const laporanList = getLaporanFromStorage();
+    const itemToEdit = laporanList.find(item => item.id == id);
+    if (!itemToEdit) return;
+    resetForm();
+    document.getElementById('edit-id').value = itemToEdit.id;
+    document.getElementById('tanggal').value = itemToEdit.tanggal;
+    document.getElementById('nama-kegiatan').value = itemToEdit.namaKegiatan;
+    document.getElementById('lokasi').value = itemToEdit.lokasi;
+    document.getElementById('jumlah-tenaga-kerja').value = itemToEdit.jumlahTenagaKerja;
+    document.getElementById('masalah').value = itemToEdit.masalah;
+    document.getElementById('cara-kerja').value = itemToEdit.caraKerja;
+    document.getElementById('lama-pengerjaan').value = itemToEdit.lamaPengerjaan;
+    if (itemToEdit.alatBantu) {
+        itemToEdit.alatBantu.forEach(alat => tambahAlatBantuKeList(alat));
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function deleteData(id) {
+    if (confirm('Apakah Anda yakin ingin menghapus data laporan ini?')) {
+        let laporanList = getLaporanFromStorage();
+        laporanList = laporanList.filter(item => item.id != id);
+        localStorage.setItem('laporanData_v2', JSON.stringify(laporanList));
+        renderTable();
+    }
+}
+function resetForm() {
+    document.getElementById('laporan-form').reset();
+    document.getElementById('edit-id').value = '';
+    document.getElementById('alat-bantu-list').innerHTML = '';
+}
+function resetAllData() {
+    if (confirm('APAKAH ANDA YAKIN INGIN MENGHAPUS SEMUA DATA LAPORAN?\n\nTindakan ini tidak dapat dibatalkan.')) {
+        localStorage.removeItem('laporanData_v2');
+        localStorage.removeItem('lastId_v2');
+        renderTable();
+        alert('Semua data laporan telah berhasil dihapus.');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', renderTable);
+</script>
+
+</body>
+</html>
