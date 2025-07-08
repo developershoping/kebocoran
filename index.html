@@ -79,8 +79,7 @@
             <input type="hidden" id="edit-id">
             <h4>Data Utama Kejadian</h4>
             <div class="form-grid">
-                <!-- [MODIFIKASI 1]: Mengubah input type="date" menjadi type="text" dengan placeholder dd/mm/yyyy -->
-                <div class="form-group"><label for="tanggal">Tanggal Kejadian</label><input type="text" id="tanggal" placeholder="dd/mm/yyyy" required></div>
+                <div class="form-group"><label for="tanggal">Tanggal Kejadian</label><input type="date" id="tanggal" required></div>
                 <div class="form-group"><label for="nama-kegiatan">Nama Kegiatan</label><input type="text" id="nama-kegiatan" required></div>
                 <div class="form-group"><label for="lokasi">Lokasi</label><input type="text" id="lokasi"></div>
                 <div class="form-group"><label for="jumlah-tenaga-kerja">Jumlah Tenaga Kerja</label><input type="text" id="jumlah-tenaga-kerja"></div>
@@ -171,7 +170,6 @@
     }
     function formatTanggalLengkap(tanggalString) {
         if (!tanggalString) return '';
-        // Fungsi ini sudah benar karena menerima format yyyy-mm-dd
         const parts = tanggalString.split('-');
         const tanggalObj = new Date(parts[0], parts[1] - 1, parts[2]);
         const namaHari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
@@ -207,19 +205,8 @@
                 return;
             }
         }
-
-        // [MODIFIKASI 2]: Konversi format tanggal dari dd/mm/yyyy ke yyyy-mm-dd sebelum disimpan
-        const tanggalInput = document.getElementById('tanggal').value;
-        const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
-        if (!dateRegex.test(tanggalInput)) {
-            alert('Format tanggal salah. Harap gunakan format dd/mm/yyyy (contoh: 25/12/2023).');
-            return; // Hentikan proses simpan jika format salah
-        }
-        const parts = tanggalInput.split('/'); // ["dd", "mm", "yyyy"]
-        const tanggalISO = `${parts[2]}-${parts[1]}-${parts[0]}`; // "yyyy-mm-dd"
-
         const laporanData = {
-            tanggal: tanggalISO, // Simpan dalam format standar yyyy-mm-dd
+            tanggal: document.getElementById('tanggal').value,
             namaKegiatan: document.getElementById('nama-kegiatan').value,
             lokasi: document.getElementById('lokasi').value,
             jumlahTenagaKerja: document.getElementById('jumlah-tenaga-kerja').value,
@@ -228,7 +215,6 @@
             lamaPengerjaan: document.getElementById('lama-pengerjaan').value,
             alatBantu: alatBantu
         };
-
         let laporanList = getLaporanFromStorage();
         if (id) {
             const index = laporanList.findIndex(item => item.id == id);
@@ -272,9 +258,13 @@
             document.getElementById('bahan').focus();
         }
     }
-    
+
+    // =====================================================================
+    // [MODIFIKASI UTAMA] Fungsi renderTable disesuaikan untuk merge tanggal
+    // =====================================================================
     function renderTable(dataToRender) {
         const table = document.getElementById('laporan-table');
+        // Ganti semua tbody dengan satu tbody baru untuk mempermudah manipulasi
         table.querySelectorAll('tbody').forEach(tbody => tbody.remove());
         const tableBody = document.createElement('tbody');
 
@@ -284,8 +274,10 @@
             return;
         }
 
+        // 1. Urutkan data berdasarkan tanggal (penting untuk pengelompokan)
         dataToRender.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
 
+        // 2. Kelompokkan data berdasarkan tanggal
         const groupedData = dataToRender.reduce((acc, item) => {
             const date = item.tanggal;
             if (!acc[date]) {
@@ -297,24 +289,33 @@
 
         let nomorUrut = 1;
 
+        // 3. Render tabel dari data yang sudah dikelompokkan
         for (const date in groupedData) {
             const itemsForDate = groupedData[date];
+            
+            // Hitung total rowspan yang dibutuhkan untuk grup tanggal ini
             const totalRowspanForGroup = itemsForDate.reduce((sum, item) => sum + Math.max(1, item.alatBantu.length), 0);
+            
             let isFirstRowOfGroup = true;
 
+            // Loop untuk setiap item (laporan) dalam grup tanggal yang sama
             itemsForDate.forEach(item => {
                 const rowCountForItem = Math.max(1, item.alatBantu.length);
                 
+                // Loop untuk setiap baris dari satu item (termasuk alat bantu)
                 for (let i = 0; i < rowCountForItem; i++) {
                     const row = document.createElement('tr');
                     let rowHTML = '';
 
+                    // Jika ini adalah baris pertama dari seluruh grup tanggal,
+                    // tambahkan sel NO dan TANGGAL dengan rowspan
                     if (isFirstRowOfGroup) {
                         rowHTML += `<td rowspan="${totalRowspanForGroup}">${nomorUrut}</td>`;
                         rowHTML += `<td rowspan="${totalRowspanForGroup}">${formatTanggalLengkap(item.tanggal)}</td>`;
-                        isFirstRowOfGroup = false;
+                        isFirstRowOfGroup = false; // Tandai agar tidak ditambahkan lagi
                     }
                     
+                    // Jika ini adalah baris pertama untuk item ini, tambahkan data utama
                     if (i === 0) {
                         rowHTML += `
                             <td rowspan="${rowCountForItem}">${item.namaKegiatan}</td>
@@ -325,11 +326,13 @@
                             <td rowspan="${rowCountForItem}">${item.lamaPengerjaan}</td>`;
                     }
                     
+                    // Tambahkan data alat bantu untuk setiap baris
                     rowHTML += `
                         <td>${item.alatBantu[i]?.bahan || ''}</td>
                         <td>${item.alatBantu[i]?.ukuran || ''}</td>
                         <td>${item.alatBantu[i]?.banyaknya || ''}</td>`;
 
+                    // Jika ini baris pertama untuk item ini, tambahkan tombol Aksi
                     if (i === 0) {
                         rowHTML += `
                             <td rowspan="${rowCountForItem}" class="action-buttons">
@@ -343,7 +346,7 @@
                 }
             });
 
-            nomorUrut++;
+            nomorUrut++; // Naikkan nomor urut untuk grup tanggal berikutnya
         }
         
         table.appendChild(tableBody);
@@ -391,14 +394,7 @@
         if (!itemToEdit) return;
         resetForm();
         document.getElementById('edit-id').value = itemToEdit.id;
-
-        // [MODIFIKASI 3]: Konversi format tanggal dari yyyy-mm-dd ke dd/mm/yyyy saat data dimuat ke form
-        if (itemToEdit.tanggal) {
-            const parts = itemToEdit.tanggal.split('-'); // ["yyyy", "mm", "dd"]
-            const tanggalDisplay = `${parts[2]}/${parts[1]}/${parts[0]}`; // "dd/mm/yyyy"
-            document.getElementById('tanggal').value = tanggalDisplay;
-        }
-
+        document.getElementById('tanggal').value = itemToEdit.tanggal;
         document.getElementById('nama-kegiatan').value = itemToEdit.namaKegiatan;
         document.getElementById('lokasi').value = itemToEdit.lokasi;
         document.getElementById('jumlah-tenaga-kerja').value = itemToEdit.jumlahTenagaKerja;
@@ -442,5 +438,6 @@
         applyFilter();
     });
 </script>
+
 </body>
 </html>
