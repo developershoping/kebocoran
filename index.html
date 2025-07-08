@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laporan Kinerja Perawatan & Pemeliharaan</title>
     <style>
-        /* CSS Umum (Tidak ada perubahan signifikan di sini, tetap sama) */
+        /* CSS tidak ada perubahan, tetap sama */
         body { font-family: Arial, sans-serif; margin: 0; padding: 20px 2cm; background-color: #f4f4f4; color: #333; }
         .container { max-width: 100%; margin: auto; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border-radius: 8px; }
         .report-header-image { width: 100%; margin-bottom: 20px; }
@@ -17,20 +17,19 @@
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
         .form-group { display: flex; flex-direction: column; }
         .form-group label { margin-bottom: 5px; font-weight: bold; }
-        .form-group input, .form-group textarea, .form-group select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%; box-sizing: border-box; } /* [MODIFIKASI] Menambahkan select */
+        .form-group input, .form-group textarea, .form-group select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%; box-sizing: border-box; }
         #alat-bantu-form { margin-top: 20px; padding: 15px; border: 1px dashed #007bff; border-radius: 5px; background-color: #f8f9fa; }
         #alat-bantu-list-container { margin-top: 15px; }
         #alat-bantu-list li { margin-bottom: 5px; background: #e9ecef; padding: 5px 10px; border-radius: 4px; }
         .btn, button { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; margin-right: 10px; margin-top: 10px; }
         .btn-add { background-color: #28a745; color: white; }
         .btn-save { background-color: #007bff; color: white; }
-        .btn-print { background-color: #17a2b8; color: white; } /* [MODIFIKASI] Ganti warna agar beda */
+        .btn-print { background-color: #17a2b8; color: white; }
         .btn-edit { background-color: #ffc107; color: black; padding: 5px 10px; margin: 0 5px 0 0; }
         .btn-delete { background-color: #dc3545; color: white; padding: 5px 10px; margin: 0; }
         button.remove-item { background-color: #dc3545; color: white; padding: 2px 8px; font-size: 0.8em; margin-left: 10px; }
         .btn-reset-all { background-color: #c82333; color: white; }
         .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
-        /* [MODIFIKASI] CSS untuk filter */
         .filter-container { display: flex; gap: 10px; align-items: center; }
         .filter-container label { font-weight: bold; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9em; }
@@ -49,17 +48,8 @@
             .form-container, .table-header, .action-buttons, .filter-container { display: none !important; }
             th, td { padding: 5px; border: 1px solid #000; }
             .report-header-image img { width: 50%; display: block; margin: 0 auto 20px auto; }
-            
-            /* [PENYESUAIAN F4] Mengubah ukuran halaman cetak ke F4 Landscape */
-            @page {
-                /* Ukuran F4 adalah 215mm x 330mm. Untuk landscape, lebarnya adalah 330mm. */
-                size: 330mm 215mm; 
-                /* Margin disesuaikan untuk F4: 1cm atas/bawah, 1.5cm kiri/kanan */
-                margin: 1cm 1.5cm; 
-            }
-
+            @page { size: 330mm 215mm; margin: 1cm 1.5cm; }
             .report-footer { display: block; break-inside: avoid; page-break-inside: avoid; }
-            /* Memastikan setiap entri data tidak terpotong di tengah halaman */
             #laporan-table > tbody { break-inside: avoid; page-break-inside: avoid; }
         }
 
@@ -74,7 +64,6 @@
 </head>
 <body>
 
-<!-- Bagian <body> dan <script> tidak ada perubahan, tetap sama seperti sebelumnya -->
 <div class="container">
     <div class="report-header-image">
         <img src="kop.jpg" alt="Kop Surat Laporan">
@@ -85,7 +74,6 @@
         <div class="title-line" id="laporan-periode">HASIL LAPORAN KINERJA KEBOCORAN</div>
     </div>
     <div class="form-container">
-        <!-- Form tidak berubah -->
         <h2 class="form-title">Form Input Laporan Kejadian</h2>
         <form id="laporan-form">
             <input type="hidden" id="edit-id">
@@ -118,8 +106,6 @@
     <div class="table-container">
         <div class="table-header">
             <h2 class="table-title">Data Laporan Tersimpan</h2>
-            
-            <!-- [MODIFIKASI] Form Filter Bulan dan Tahun -->
             <div class="filter-container">
                 <div class="form-group">
                     <label for="filter-bulan">Bulan:</label>
@@ -144,9 +130,7 @@
                     <input type="number" id="filter-tahun" onchange="applyFilter()" style="width: 100px;">
                 </div>
             </div>
-            
             <div>
-                <!-- [MODIFIKASI] Tombol cetak memanggil fungsi baru -->
                 <button class="btn btn-print" onclick="cetakLaporanBulanan()">Cetak Laporan</button>
                 <button class="btn btn-reset-all" onclick="resetAllData()">Reset Semua Data</button>
             </div>
@@ -164,7 +148,6 @@
         </table>
     </div>
     <div class="report-footer">
-        <!-- Footer tidak berubah -->
         <div class="signature-block">
             <div class="signature-col"><p>Mengetahui</p><p>Direktur</p><p class="name">Moses P. Limbongan, S. S</p></div>
             <div class="signature-col"><p>Di Periksa</p><p>Kepala Bagian Perawatan</p><p class="name">Linan Patanggi</p></div>
@@ -174,259 +157,286 @@
 </div>
 
 <script>
-    // Seluruh kode JavaScript tidak perlu diubah karena perubahan hanya pada CSS.
-    // Kode JavaScript yang sudah ada akan tetap berfungsi dengan baik.
-const NAMA_BULAN = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    const NAMA_BULAN = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-// Fungsi getNextId, getLaporanFromStorage, formatTanggalLengkap tidak berubah
-function getNextId() {
-    const lastId = localStorage.getItem('lastId_v2') || '0';
-    const nextId = parseInt(lastId) + 1;
-    localStorage.setItem('lastId_v2', nextId);
-    return nextId;
-}
-function getLaporanFromStorage() {
-    return JSON.parse(localStorage.getItem('laporanData_v2')) || [];
-}
-function formatTanggalLengkap(tanggalString) {
-    if (!tanggalString) return '';
-    const parts = tanggalString.split('-');
-    const tanggalObj = new Date(parts[0], parts[1] - 1, parts[2]);
-    const namaHari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-    const hari = namaHari[tanggalObj.getDay()];
-    const tgl = String(tanggalObj.getDate()).padStart(2, '0');
-    const bulan = NAMA_BULAN[tanggalObj.getMonth()];
-    const tahun = tanggalObj.getFullYear();
-    return `${hari}, ${tgl} ${bulan} ${tahun}`;
-}
-
-// [MODIFIKASI] updateLaporanPeriode sekarang berdasarkan filter
-function updateLaporanPeriode(bulan, tahun) {
-    const periodeElement = document.getElementById('laporan-periode');
-    let periodeText = "PERIODE ";
-    
-    if (bulan && tahun) {
-        periodeText += `${NAMA_BULAN[bulan-1].toUpperCase()} ${tahun}`;
-    } else if (tahun) {
-        periodeText += `TAHUN ${tahun}`;
-    } else {
-        periodeText = "SEMUA PERIODE";
+    function getNextId() {
+        const lastId = localStorage.getItem('lastId_v2') || '0';
+        const nextId = parseInt(lastId) + 1;
+        localStorage.setItem('lastId_v2', nextId);
+        return nextId;
     }
-    
-    periodeElement.textContent = `HASIL LAPORAN KINERJA KEBOCORAN ${periodeText}`;
-}
+    function getLaporanFromStorage() {
+        return JSON.parse(localStorage.getItem('laporanData_v2')) || [];
+    }
+    function formatTanggalLengkap(tanggalString) {
+        if (!tanggalString) return '';
+        const parts = tanggalString.split('-');
+        const tanggalObj = new Date(parts[0], parts[1] - 1, parts[2]);
+        const namaHari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+        const hari = namaHari[tanggalObj.getDay()];
+        const tgl = String(tanggalObj.getDate()).padStart(2, '0');
+        const bulan = NAMA_BULAN[tanggalObj.getMonth()];
+        const tahun = tanggalObj.getFullYear();
+        return `${hari}, ${tgl} ${bulan} ${tahun}`;
+    }
 
-// Event listener submit form (sedikit dimodifikasi)
-document.getElementById('laporan-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    // ... (logika simpan data sama seperti sebelumnya) ...
-    const id = document.getElementById('edit-id').value;
-    let alatBantu = [];
-    document.querySelectorAll('#alat-bantu-list li').forEach(li => {
-        alatBantu.push(JSON.parse(li.dataset.alat));
+    function updateLaporanPeriode(bulan, tahun) {
+        const periodeElement = document.getElementById('laporan-periode');
+        let periodeText = "PERIODE ";
+        if (bulan && tahun) {
+            periodeText += `${NAMA_BULAN[bulan-1].toUpperCase()} ${tahun}`;
+        } else if (tahun) {
+            periodeText += `TAHUN ${tahun}`;
+        } else {
+            periodeText = "SEMUA PERIODE";
+        }
+        periodeElement.textContent = `HASIL LAPORAN KINERJA KEBOCORAN ${periodeText}`;
+    }
+
+    document.getElementById('laporan-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const id = document.getElementById('edit-id').value;
+        let alatBantu = [];
+        document.querySelectorAll('#alat-bantu-list li').forEach(li => {
+            alatBantu.push(JSON.parse(li.dataset.alat));
+        });
+        if (alatBantu.length === 0) {
+            if (!confirm('Anda belum menambahkan Alat Bantu. Tetap simpan?')) {
+                return;
+            }
+        }
+        const laporanData = {
+            tanggal: document.getElementById('tanggal').value,
+            namaKegiatan: document.getElementById('nama-kegiatan').value,
+            lokasi: document.getElementById('lokasi').value,
+            jumlahTenagaKerja: document.getElementById('jumlah-tenaga-kerja').value,
+            masalah: document.getElementById('masalah').value,
+            caraKerja: document.getElementById('cara-kerja').value,
+            lamaPengerjaan: document.getElementById('lama-pengerjaan').value,
+            alatBantu: alatBantu
+        };
+        let laporanList = getLaporanFromStorage();
+        if (id) {
+            const index = laporanList.findIndex(item => item.id == id);
+            if (index > -1) {
+                laporanList[index] = { ...laporanData, id: parseInt(id) };
+            }
+        } else {
+            laporanData.id = getNextId();
+            laporanList.push(laporanData);
+        }
+        localStorage.setItem('laporanData_v2', JSON.stringify(laporanList));
+        resetForm();
+        applyFilter();
     });
-    if (alatBantu.length === 0) {
-        if (!confirm('Anda belum menambahkan Alat Bantu. Tetap simpan?')) {
+
+    function tambahAlatBantuKeList(data = null) {
+        const list = document.getElementById('alat-bantu-list');
+        const alat = data || {
+            bahan: document.getElementById('bahan').value,
+            ukuran: document.getElementById('ukuran').value,
+            banyaknya: document.getElementById('banyaknya').value
+        };
+        if (!alat.bahan.trim()) {
+            alert('Nama Bahan tidak boleh kosong.');
             return;
         }
-    }
-    const laporanData = {
-        tanggal: document.getElementById('tanggal').value,
-        namaKegiatan: document.getElementById('nama-kegiatan').value,
-        lokasi: document.getElementById('lokasi').value,
-        jumlahTenagaKerja: document.getElementById('jumlah-tenaga-kerja').value,
-        masalah: document.getElementById('masalah').value,
-        caraKerja: document.getElementById('cara-kerja').value,
-        lamaPengerjaan: document.getElementById('lama-pengerjaan').value,
-        alatBantu: alatBantu
-    };
-    let laporanList = getLaporanFromStorage();
-    if (id) {
-        const index = laporanList.findIndex(item => item.id == id);
-        if (index > -1) {
-            laporanList[index] = { ...laporanData, id: parseInt(id) };
+        const li = document.createElement('li');
+        li.textContent = `Bahan: ${alat.bahan}, Ukuran: ${alat.ukuran}, Banyaknya: ${alat.banyaknya}`;
+        li.dataset.alat = JSON.stringify(alat);
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = 'x';
+        removeBtn.className = 'remove-item';
+        removeBtn.type = 'button';
+        removeBtn.onclick = function() { li.remove(); };
+        li.appendChild(removeBtn);
+        list.appendChild(li);
+        if (!data) {
+            document.getElementById('bahan').value = '';
+            document.getElementById('ukuran').value = '';
+            document.getElementById('banyaknya').value = '';
+            document.getElementById('bahan').focus();
         }
-    } else {
-        laporanData.id = getNextId();
-        laporanList.push(laporanData);
     }
-    localStorage.setItem('laporanData_v2', JSON.stringify(laporanList));
-    resetForm();
-    applyFilter(); // [MODIFIKASI] Panggil applyFilter agar tabel ter-refresh
-});
 
-// Fungsi tambahAlatBantuKeList tidak berubah
-function tambahAlatBantuKeList(data = null) {
-    const list = document.getElementById('alat-bantu-list');
-    const alat = data || {
-        bahan: document.getElementById('bahan').value,
-        ukuran: document.getElementById('ukuran').value,
-        banyaknya: document.getElementById('banyaknya').value
-    };
-    if (!alat.bahan.trim()) {
-        alert('Nama Bahan tidak boleh kosong.');
-        return;
-    }
-    const li = document.createElement('li');
-    li.textContent = `Bahan: ${alat.bahan}, Ukuran: ${alat.ukuran}, Banyaknya: ${alat.banyaknya}`;
-    li.dataset.alat = JSON.stringify(alat);
-    const removeBtn = document.createElement('button');
-    removeBtn.textContent = 'x';
-    removeBtn.className = 'remove-item';
-    removeBtn.type = 'button';
-    removeBtn.onclick = function() { li.remove(); };
-    li.appendChild(removeBtn);
-    list.appendChild(li);
-    if (!data) {
-        document.getElementById('bahan').value = '';
-        document.getElementById('ukuran').value = '';
-        document.getElementById('banyaknya').value = '';
-        document.getElementById('bahan').focus();
-    }
-}
+    // =====================================================================
+    // [MODIFIKASI UTAMA] Fungsi renderTable disesuaikan untuk merge tanggal
+    // =====================================================================
+    function renderTable(dataToRender) {
+        const table = document.getElementById('laporan-table');
+        // Ganti semua tbody dengan satu tbody baru untuk mempermudah manipulasi
+        table.querySelectorAll('tbody').forEach(tbody => tbody.remove());
+        const tableBody = document.createElement('tbody');
 
-// [MODIFIKASI] renderTable sekarang menerima data yang sudah difilter
-function renderTable(dataToRender) {
-    const table = document.getElementById('laporan-table');
-    table.querySelectorAll('tbody').forEach(tbody => tbody.remove());
+        if (dataToRender.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="12" style="text-align:center;">Tidak ada data untuk periode yang dipilih.</td></tr>`;
+            table.appendChild(tableBody);
+            return;
+        }
 
-    if (dataToRender.length === 0) {
-        const tbody = document.createElement('tbody');
-        tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;">Tidak ada data untuk periode yang dipilih.</td></tr>`;
-        table.appendChild(tbody);
-        return;
-    }
-    
-    // Sortir data berdasarkan tanggal dari yang terlama ke terbaru
-    dataToRender.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+        // 1. Urutkan data berdasarkan tanggal (penting untuk pengelompokan)
+        dataToRender.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
 
-    dataToRender.forEach((item, index) => {
-        const rowCount = item.alatBantu.length > 0 ? item.alatBantu.length : 1;
-        const entryTbody = document.createElement('tbody');
-        for (let i = 0; i < rowCount; i++) {
-            const row = document.createElement('tr');
-            if (i === 0) {
-                row.innerHTML = `
-                    <td rowspan="${rowCount}">${index + 1}</td>
-                    <td rowspan="${rowCount}">${formatTanggalLengkap(item.tanggal)}</td>
-                    <td rowspan="${rowCount}">${item.namaKegiatan}</td>
-                    <td rowspan="${rowCount}">${item.lokasi}</td>
-                    <td rowspan="${rowCount}">${item.jumlahTenagaKerja || ''}</td>
-                    <td rowspan="${rowCount}">${item.masalah}</td>
-                    <td rowspan="${rowCount}">${item.caraKerja}</td>
-                    <td rowspan="${rowCount}">${item.lamaPengerjaan}</td>
-                    <td>${item.alatBantu[i]?.bahan || ''}</td>
-                    <td>${item.alatBantu[i]?.ukuran || ''}</td>
-                    <td>${item.alatBantu[i]?.banyaknya || ''}</td>
-                    <td rowspan="${rowCount}" class="action-buttons">
-                        <button class="btn btn-edit" onclick="editData(${item.id})">Edit</button>
-                        <button class="btn btn-delete" onclick="deleteData(${item.id})">Hapus</button>
-                    </td>`;
-            } else {
-                row.innerHTML = `
-                    <td>${item.alatBantu[i]?.bahan || ''}</td>
-                    <td>${item.alatBantu[i]?.ukuran || ''}</td>
-                    <td>${item.alatBantu[i]?.banyaknya || ''}</td>`;
+        // 2. Kelompokkan data berdasarkan tanggal
+        const groupedData = dataToRender.reduce((acc, item) => {
+            const date = item.tanggal;
+            if (!acc[date]) {
+                acc[date] = [];
             }
-            entryTbody.appendChild(row);
+            acc[date].push(item);
+            return acc;
+        }, {});
+
+        let nomorUrut = 1;
+
+        // 3. Render tabel dari data yang sudah dikelompokkan
+        for (const date in groupedData) {
+            const itemsForDate = groupedData[date];
+            
+            // Hitung total rowspan yang dibutuhkan untuk grup tanggal ini
+            const totalRowspanForGroup = itemsForDate.reduce((sum, item) => sum + Math.max(1, item.alatBantu.length), 0);
+            
+            let isFirstRowOfGroup = true;
+
+            // Loop untuk setiap item (laporan) dalam grup tanggal yang sama
+            itemsForDate.forEach(item => {
+                const rowCountForItem = Math.max(1, item.alatBantu.length);
+                
+                // Loop untuk setiap baris dari satu item (termasuk alat bantu)
+                for (let i = 0; i < rowCountForItem; i++) {
+                    const row = document.createElement('tr');
+                    let rowHTML = '';
+
+                    // Jika ini adalah baris pertama dari seluruh grup tanggal,
+                    // tambahkan sel NO dan TANGGAL dengan rowspan
+                    if (isFirstRowOfGroup) {
+                        rowHTML += `<td rowspan="${totalRowspanForGroup}">${nomorUrut}</td>`;
+                        rowHTML += `<td rowspan="${totalRowspanForGroup}">${formatTanggalLengkap(item.tanggal)}</td>`;
+                        isFirstRowOfGroup = false; // Tandai agar tidak ditambahkan lagi
+                    }
+                    
+                    // Jika ini adalah baris pertama untuk item ini, tambahkan data utama
+                    if (i === 0) {
+                        rowHTML += `
+                            <td rowspan="${rowCountForItem}">${item.namaKegiatan}</td>
+                            <td rowspan="${rowCountForItem}">${item.lokasi}</td>
+                            <td rowspan="${rowCountForItem}">${item.jumlahTenagaKerja || ''}</td>
+                            <td rowspan="${rowCountForItem}">${item.masalah}</td>
+                            <td rowspan="${rowCountForItem}">${item.caraKerja}</td>
+                            <td rowspan="${rowCountForItem}">${item.lamaPengerjaan}</td>`;
+                    }
+                    
+                    // Tambahkan data alat bantu untuk setiap baris
+                    rowHTML += `
+                        <td>${item.alatBantu[i]?.bahan || ''}</td>
+                        <td>${item.alatBantu[i]?.ukuran || ''}</td>
+                        <td>${item.alatBantu[i]?.banyaknya || ''}</td>`;
+
+                    // Jika ini baris pertama untuk item ini, tambahkan tombol Aksi
+                    if (i === 0) {
+                        rowHTML += `
+                            <td rowspan="${rowCountForItem}" class="action-buttons">
+                                <button class="btn btn-edit" onclick="editData(${item.id})">Edit</button>
+                                <button class="btn btn-delete" onclick="deleteData(${item.id})">Hapus</button>
+                            </td>`;
+                    }
+                    
+                    row.innerHTML = rowHTML;
+                    tableBody.appendChild(row);
+                }
+            });
+
+            nomorUrut++; // Naikkan nomor urut untuk grup tanggal berikutnya
         }
-        table.appendChild(entryTbody);
+        
+        table.appendChild(tableBody);
+    }
+
+    function applyFilter() {
+        const bulan = document.getElementById('filter-bulan').value;
+        const tahun = document.getElementById('filter-tahun').value;
+        
+        let allData = getLaporanFromStorage();
+        let filteredData = allData;
+
+        if (tahun) {
+            filteredData = filteredData.filter(item => {
+                const itemTahun = new Date(item.tanggal).getFullYear();
+                return itemTahun == tahun;
+            });
+        }
+
+        if (bulan) {
+            filteredData = filteredData.filter(item => {
+                const itemBulan = new Date(item.tanggal).getMonth() + 1;
+                return itemBulan == bulan;
+            });
+        }
+
+        renderTable(filteredData);
+        updateLaporanPeriode(bulan, tahun);
+    }
+
+    function cetakLaporanBulanan() {
+        const bulan = document.getElementById('filter-bulan').value;
+        const tahun = document.getElementById('filter-tahun').value;
+
+        if (!bulan || !tahun) {
+            alert("Silakan pilih Bulan dan Tahun terlebih dahulu untuk mencetak laporan.");
+            return;
+        }
+        window.print();
+    }
+
+    function editData(id) {
+        const laporanList = getLaporanFromStorage();
+        const itemToEdit = laporanList.find(item => item.id == id);
+        if (!itemToEdit) return;
+        resetForm();
+        document.getElementById('edit-id').value = itemToEdit.id;
+        document.getElementById('tanggal').value = itemToEdit.tanggal;
+        document.getElementById('nama-kegiatan').value = itemToEdit.namaKegiatan;
+        document.getElementById('lokasi').value = itemToEdit.lokasi;
+        document.getElementById('jumlah-tenaga-kerja').value = itemToEdit.jumlahTenagaKerja;
+        document.getElementById('masalah').value = itemToEdit.masalah;
+        document.getElementById('cara-kerja').value = itemToEdit.caraKerja;
+        document.getElementById('lama-pengerjaan').value = itemToEdit.lamaPengerjaan;
+        if (itemToEdit.alatBantu) {
+            itemToEdit.alatBantu.forEach(alat => tambahAlatBantuKeList(alat));
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteData(id) {
+        if (confirm('Apakah Anda yakin ingin menghapus data laporan ini?')) {
+            let laporanList = getLaporanFromStorage();
+            laporanList = laporanList.filter(item => item.id != id);
+            localStorage.setItem('laporanData_v2', JSON.stringify(laporanList));
+            applyFilter();
+        }
+    }
+
+    function resetForm() {
+        document.getElementById('laporan-form').reset();
+        document.getElementById('edit-id').value = '';
+        document.getElementById('alat-bantu-list').innerHTML = '';
+    }
+
+    function resetAllData() {
+        if (confirm('APAKAH ANDA YAKIN INGIN MENGHAPUS SEMUA DATA LAPORAN?\n\nTindakan ini tidak dapat dibatalkan.')) {
+            localStorage.removeItem('laporanData_v2');
+            localStorage.removeItem('lastId_v2');
+            applyFilter();
+            alert('Semua data laporan telah berhasil dihapus.');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const today = new Date();
+        document.getElementById('filter-bulan').value = today.getMonth() + 1;
+        document.getElementById('filter-tahun').value = today.getFullYear();
+        applyFilter();
     });
-}
-
-// [MODIFIKASI BARU] Fungsi untuk menerapkan filter
-function applyFilter() {
-    const bulan = document.getElementById('filter-bulan').value;
-    const tahun = document.getElementById('filter-tahun').value;
-    
-    let allData = getLaporanFromStorage();
-    let filteredData = allData;
-
-    if (tahun) {
-        filteredData = filteredData.filter(item => {
-            const itemTahun = new Date(item.tanggal).getFullYear();
-            return itemTahun == tahun;
-        });
-    }
-
-    if (bulan) {
-        filteredData = filteredData.filter(item => {
-            // getMonth() adalah 0-indexed, jadi +1
-            const itemBulan = new Date(item.tanggal).getMonth() + 1;
-            return itemBulan == bulan;
-        });
-    }
-
-    renderTable(filteredData);
-    updateLaporanPeriode(bulan, tahun);
-}
-
-// [MODIFIKASI BARU] Fungsi untuk mencetak laporan berdasarkan filter
-function cetakLaporanBulanan() {
-    const bulan = document.getElementById('filter-bulan').value;
-    const tahun = document.getElementById('filter-tahun').value;
-
-    if (!bulan || !tahun) {
-        alert("Silakan pilih Bulan dan Tahun terlebih dahulu untuk mencetak laporan.");
-        return;
-    }
-    
-    // Panggil fungsi print bawaan browser. CSS @media print akan otomatis diterapkan.
-    window.print();
-}
-
-
-// Fungsi editData, deleteData, resetForm, resetAllData tidak berubah
-function editData(id) {
-    const laporanList = getLaporanFromStorage();
-    const itemToEdit = laporanList.find(item => item.id == id);
-    if (!itemToEdit) return;
-    resetForm();
-    document.getElementById('edit-id').value = itemToEdit.id;
-    document.getElementById('tanggal').value = itemToEdit.tanggal;
-    // ... (sisa fungsi sama)
-    document.getElementById('nama-kegiatan').value = itemToEdit.namaKegiatan;
-    document.getElementById('lokasi').value = itemToEdit.lokasi;
-    document.getElementById('jumlah-tenaga-kerja').value = itemToEdit.jumlahTenagaKerja;
-    document.getElementById('masalah').value = itemToEdit.masalah;
-    document.getElementById('cara-kerja').value = itemToEdit.caraKerja;
-    document.getElementById('lama-pengerjaan').value = itemToEdit.lamaPengerjaan;
-    if (itemToEdit.alatBantu) {
-        itemToEdit.alatBantu.forEach(alat => tambahAlatBantuKeList(alat));
-    }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-function deleteData(id) {
-    if (confirm('Apakah Anda yakin ingin menghapus data laporan ini?')) {
-        let laporanList = getLaporanFromStorage();
-        laporanList = laporanList.filter(item => item.id != id);
-        localStorage.setItem('laporanData_v2', JSON.stringify(laporanList));
-        applyFilter(); // [MODIFIKASI] Panggil applyFilter agar tabel ter-refresh
-    }
-}
-function resetForm() {
-    document.getElementById('laporan-form').reset();
-    document.getElementById('edit-id').value = '';
-    document.getElementById('alat-bantu-list').innerHTML = '';
-}
-function resetAllData() {
-    if (confirm('APAKAH ANDA YAKIN INGIN MENGHAPUS SEMUA DATA LAPORAN?\n\nTindakan ini tidak dapat dibatalkan.')) {
-        localStorage.removeItem('laporanData_v2');
-        localStorage.removeItem('lastId_v2');
-        applyFilter(); // [MODIFIKASI] Panggil applyFilter agar tabel kosong
-        alert('Semua data laporan telah berhasil dihapus.');
-    }
-}
-
-// [MODIFIKASI] Panggil applyFilter saat halaman dimuat
-document.addEventListener('DOMContentLoaded', () => {
-    // Set filter ke bulan dan tahun saat ini secara default
-    const today = new Date();
-    document.getElementById('filter-bulan').value = today.getMonth() + 1;
-    document.getElementById('filter-tahun').value = today.getFullYear();
-    
-    applyFilter();
-});
 </script>
 
 </body>
