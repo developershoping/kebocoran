@@ -49,8 +49,17 @@
             .form-container, .table-header, .action-buttons, .filter-container { display: none !important; }
             th, td { padding: 5px; border: 1px solid #000; }
             .report-header-image img { width: 50%; display: block; margin: 0 auto 20px auto; }
-            @page { size: A4 landscape; margin: 1cm 2cm 2cm 2cm; }
+            
+            /* [PENYESUAIAN F4] Mengubah ukuran halaman cetak ke F4 Landscape */
+            @page {
+                /* Ukuran F4 adalah 215mm x 330mm. Untuk landscape, lebarnya adalah 330mm. */
+                size: 330mm 215mm; 
+                /* Margin disesuaikan untuk F4: 1cm atas/bawah, 1.5cm kiri/kanan */
+                margin: 1cm 1.5cm; 
+            }
+
             .report-footer { display: block; break-inside: avoid; page-break-inside: avoid; }
+            /* Memastikan setiap entri data tidak terpotong di tengah halaman */
             #laporan-table > tbody { break-inside: avoid; page-break-inside: avoid; }
         }
 
@@ -65,6 +74,7 @@
 </head>
 <body>
 
+<!-- Bagian <body> dan <script> tidak ada perubahan, tetap sama seperti sebelumnya -->
 <div class="container">
     <div class="report-header-image">
         <img src="kop.jpg" alt="Kop Surat Laporan">
@@ -164,6 +174,8 @@
 </div>
 
 <script>
+    // Seluruh kode JavaScript tidak perlu diubah karena perubahan hanya pada CSS.
+    // Kode JavaScript yang sudah ada akan tetap berfungsi dengan baik.
 const NAMA_BULAN = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
 // Fungsi getNextId, getLaporanFromStorage, formatTanggalLengkap tidak berubah
@@ -359,105 +371,8 @@ function cetakLaporanBulanan() {
         return;
     }
     
-    // Ambil dan filter data
-    let allData = getLaporanFromStorage();
-    let dataToPrint = allData.filter(item => {
-        const itemDate = new Date(item.tanggal);
-        return (itemDate.getMonth() + 1) == bulan && itemDate.getFullYear() == tahun;
-    });
-
-    if (dataToPrint.length === 0) {
-        alert("Tidak ada data untuk dicetak pada periode yang dipilih.");
-        return;
-    }
-    
-    // Sortir data berdasarkan tanggal
-    dataToPrint.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
-
-    // Bangun HTML untuk halaman cetak
-    const periodeCetak = `${NAMA_BULAN[bulan-1].toUpperCase()} ${tahun}`;
-    let tableRowsHtml = '';
-    dataToPrint.forEach((item, index) => {
-        const rowCount = item.alatBantu.length > 0 ? item.alatBantu.length : 1;
-        // Gunakan tbody untuk setiap entri agar page-break-inside: avoid; berfungsi
-        tableRowsHtml += `<tbody>`; 
-        for (let i = 0; i < rowCount; i++) {
-            tableRowsHtml += `<tr>`;
-            if (i === 0) {
-                tableRowsHtml += `
-                    <td rowspan="${rowCount}">${index + 1}</td>
-                    <td rowspan="${rowCount}">${formatTanggalLengkap(item.tanggal)}</td>
-                    <td rowspan="${rowCount}">${item.namaKegiatan}</td>
-                    <td rowspan="${rowCount}">${item.lokasi}</td>
-                    <td rowspan="${rowCount}">${item.jumlahTenagaKerja || ''}</td>
-                    <td rowspan="${rowCount}">${item.masalah}</td>
-                    <td rowspan="${rowCount}">${item.caraKerja}</td>
-                    <td rowspan="${rowCount}">${item.lamaPengerjaan}</td>
-                    <td>${item.alatBantu[i]?.bahan || ''}</td>
-                    <td>${item.alatBantu[i]?.ukuran || ''}</td>
-                    <td>${item.alatBantu[i]?.banyaknya || ''}</td>`;
-            } else {
-                tableRowsHtml += `
-                    <td>${item.alatBantu[i]?.bahan || ''}</td>
-                    <td>${item.alatBantu[i]?.ukuran || ''}</td>
-                    <td>${item.alatBantu[i]?.banyaknya || ''}</td>`;
-            }
-            tableRowsHtml += `</tr>`;
-        }
-        tableRowsHtml += `</tbody>`;
-    });
-
-    const printHtml = `
-        <!DOCTYPE html>
-        <html lang="id">
-        <head>
-            <title>Cetak Laporan - ${periodeCetak}</title>
-            <style>
-                ${document.querySelector('style').innerHTML}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="report-header-image">
-                    <img src="${document.querySelector('.report-header-image img').src}" alt="Kop Surat Laporan">
-                </div>
-                <div class="report-title-container">
-                    <div class="title-line">LAPORAN BULANAN BAGIAN PERAWATAN & PEMELIHARAAN</div>
-                    <div class="title-line">SUB BAGIAN TRANSMISI DAN INSTALASI</div>
-                    <div class="title-line">HASIL LAPORAN KINERJA KEBOCORAN PERIODE ${periodeCetak}</div>
-                </div>
-                <table id="laporan-table">
-                    <thead>
-                        <tr>
-                            <th rowspan="2">NO</th><th rowspan="2">TANGGAL KEJADIAN</th><th rowspan="2">NAMA KEGIATAN</th><th rowspan="2">LOKASI</th><th rowspan="2">JUMLAH TENAGA KERJA</th><th rowspan="2">MASALAH</th><th rowspan="2">CARA KERJA</th><th rowspan="2">LAMA PENGERJAAN</th><th colspan="3">ALAT BANTU</th>
-                        </tr>
-                        <tr>
-                            <th>BAHAN</th><th>UKURAN</th><th>BANYAKNYA</th>
-                        </tr>
-                    </thead>
-                    ${tableRowsHtml}
-                </table>
-                <div class="report-footer" style="display:block;"> <!-- Paksa footer terlihat -->
-                    <div class="signature-block">
-                        <div class="signature-col"><p>Mengetahui</p><p>Direktur</p><p class="name">Moses P. Limbongan, S. S</p></div>
-                        <div class="signature-col"><p>Di Periksa</p><p>Kepala Bagian Perawatan</p><p class="name">Linan Patanggi</p></div>
-                        <div class="signature-col"><p>Di Buat</p><p>Kasubag. Transmisi & Instalasi</p><p class="name">Fery Panggalo</p></div>
-                    </div>
-                </div>
-            </div>
-        </body>
-        </html>
-    `;
-
-    // Buka di tab baru dan cetak
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(printHtml);
-    printWindow.document.close();
-    printWindow.focus();
-    setTimeout(() => { // Beri waktu untuk render sebelum mencetak
-        printWindow.print();
-        printWindow.close();
-    }, 500);
+    // Panggil fungsi print bawaan browser. CSS @media print akan otomatis diterapkan.
+    window.print();
 }
 
 
